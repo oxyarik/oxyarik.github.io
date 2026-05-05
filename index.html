@@ -1,20 +1,279 @@
-<html>
-  <head>
-    <title>nhatrangtravelling</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <header>
-      <nav>
-        <!-- <button class="button">Hi</button> -->
-      </nav>
+<!-- index.html - Portfolio Template -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Портфолио веб-разработчика — проекты, навыки и контакты">
+    <title>Иван Иванов | Веб-разработчик</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="container header__container">
+            <a href="#" class="header__logo" aria-label="На главную">
+                <span class="header__logo-text">Иван Иванов</span>
+            </a>
+            
+            <button class="header__toggle" id="nav-toggle" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav-menu">
+                <span class="header__toggle-bar"></span>
+                <span class="header__toggle-bar"></span>
+                <span class="header__toggle-bar"></span>
+            </button>
+            
+            <nav class="header__nav" id="nav-menu">
+                <ul class="header__nav-list">
+                    <li class="header__nav-item">
+                        <a href="#about" class="header__nav-link active">Обо мне</a>
+                    </li>
+                    <li class="header__nav-item">
+                        <a href="#projects" class="header__nav-link">Проекты</a>
+                    </li>
+                    <li class="header__nav-item">
+                        <a href="#contact" class="header__nav-link">Контакты</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </header>
-    <center>
-      <iframe
-        src="https://www.google.com/maps/d/embed?mid=13R4ieqigEeRu1Tv9YerEZXbhRjYZh0k&ehbc=2E312F&noprof=1"
-        width="100%"
-        height="100%"
-      ></iframe>
-    </center>
-  </body>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Hero Section -->
+        <section class="hero" id="hero">
+            <div class="container hero__container">
+                <div class="hero__content">
+                    <p class="hero__greeting">Привет, меня зовут</p>
+                    <h1 class="hero__title">Иван Иванов</h1>
+                    <p class="hero__role">Frontend-разработчик</p>
+                    <p class="hero__description">
+                        Создаю быстрые, доступные и удобные веб-интерфейсы с фокусом на пользовательский опыт и чистый код.
+                    </p>
+                    <a href="#projects" class="btn btn--primary">Смотреть проекты</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="about section" id="about">
+            <div class="container about__container">
+                <h2 class="section__title">Обо мне</h2>
+                <div class="about__content">
+                    <div class="about__photo-placeholder" aria-label="Фото профиля">
+                        <span>Фото</span>
+                    </div>
+                    <div class="about__text">
+                        <p>
+                            Я фронтенд-разработчик с более чем 5-летним опытом создания веб-приложений. 
+                            Специализируюсь на разработке производительных интерфейсов с использованием современных технологий 
+                            и лучших практик веб-доступности.
+                        </p>
+                        <p>
+                            В своей работе я придерживаюсь принципов чистого кода, модульности и переиспользуемости компонентов. 
+                            Всегда стремлюсь к тому, чтобы конечный продукт был не только функциональным, но и удобным для пользователей 
+                            с любыми возможностями.
+                        </p>
+                        <p>
+                            Когда я не пишу код, я изучаю новые технологии, участвую в опенсорс-проектах и делюсь знаниями 
+                            с сообществом разработчиков.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section class="projects section" id="projects">
+            <div class="container projects__container">
+                <h2 class="section__title">Проекты</h2>
+                <div class="projects__grid">
+                    <!-- Project Card 1 -->
+                    <article class="project-card">
+                        <div class="project-card__image" aria-label="Изображение проекта"></div>
+                        <div class="project-card__content">
+                            <h3 class="project-card__title">E-commerce Платформа</h3>
+                            <p class="project-card__description">
+                                Полнофункциональный интернет-магазин с корзиной, оплатой и админ-панелью.
+                            </p>
+                            <div class="project-card__tags">
+                                <span class="tag">HTML</span>
+                                <span class="tag">CSS</span>
+                                <span class="tag">JavaScript</span>
+                            </div>
+                            <a href="#" class="project-card__link" aria-label="Перейти к проекту E-commerce">
+                                Посмотреть проект →
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Project Card 2 -->
+                    <article class="project-card">
+                        <div class="project-card__image" aria-label="Изображение проекта"></div>
+                        <div class="project-card__content">
+                            <h3 class="project-card__title">Dashboard Аналитики</h3>
+                            <p class="project-card__description">
+                                Интерактивная панель визуализации данных с графиками и фильтрами.
+                            </p>
+                            <div class="project-card__tags">
+                                <span class="tag">SVG</span>
+                                <span class="tag">Chart API</span>
+                                <span class="tag">Flexbox</span>
+                            </div>
+                            <a href="#" class="project-card__link" aria-label="Перейти к проекту Dashboard">
+                                Посмотреть проект →
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Project Card 3 -->
+                    <article class="project-card">
+                        <div class="project-card__image" aria-label="Изображение проекта"></div>
+                        <div class="project-card__content">
+                            <h3 class="project-card__title">Task Manager</h3>
+                            <p class="project-card__description">
+                                Приложение для управления задачами с drag-and-drop и локальным хранилищем.
+                            </p>
+                            <div class="project-card__tags">
+                                <span class="tag">LocalStorage</span>
+                                <span class="tag">Grid</span>
+                                <span class="tag">ES6+</span>
+                            </div>
+                            <a href="#" class="project-card__link" aria-label="Перейти к проекту Task Manager">
+                                Посмотреть проект →
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Project Card 4 -->
+                    <article class="project-card">
+                        <div class="project-card__image" aria-label="Изображение проекта"></div>
+                        <div class="project-card__content">
+                            <h3 class="project-card__title">Landing Page</h3>
+                            <p class="project-card__description">
+                                Адаптивный лендинг для стартапа с анимациями и формой захвата.
+                            </p>
+                            <div class="project-card__tags">
+                                <span class="tag">CSS Animations</span>
+                                <span class="tag">Forms</span>
+                                <span class="tag">Responsive</span>
+                            </div>
+                            <a href="#" class="project-card__link" aria-label="Перейти к проекту Landing Page">
+                                Посмотреть проект →
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Project Card 5 -->
+                    <article class="project-card">
+                        <div class="project-card__image" aria-label="Изображение проекта"></div>
+                        <div class="project-card__content">
+                            <h3 class="project-card__title">Weather App</h3>
+                            <p class="project-card__description">
+                                Приложение погоды с геолокацией и прогнозом на неделю.
+                            </p>
+                            <div class="project-card__tags">
+                                <span class="tag">Fetch API</span>
+                                <span class="tag">Geolocation</span>
+                                <span class="tag">Async/Await</span>
+                            </div>
+                            <a href="#" class="project-card__link" aria-label="Перейти к проекту Weather App">
+                                Посмотреть проект →
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Project Card 6 -->
+                    <article class="project-card">
+                        <div class="project-card__image" aria-label="Изображение проекта"></div>
+                        <div class="project-card__content">
+                            <h3 class="project-card__title">Blog Platform</h3>
+                            <p class="project-card__description">
+                                Минималистичная платформа для ведения блога с поддержкой Markdown.
+                            </p>
+                            <div class="project-card__tags">
+                                <span class="tag">Markdown</span>
+                                <span class="tag">Typography</span>
+                                <span class="tag">SEO</span>
+                            </div>
+                            <a href="#" class="project-card__link" aria-label="Перейти к проекту Blog Platform">
+                                Посмотреть проект →
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact section" id="contact">
+            <div class="container contact__container">
+                <h2 class="section__title">Контакты</h2>
+                <div class="contact__content">
+                    <div class="contact__info">
+                        <p class="contact__text">
+                            Открыт для новых проектов и интересных предложений. 
+                            Свяжитесь со мной любым удобным способом:
+                        </p>
+                        <ul class="contact__list">
+                            <li class="contact__item">
+                                <a href="mailto:ivan@example.com" class="contact__link">
+                                    ivan@example.com
+                                </a>
+                            </li>
+                            <li class="contact__item">
+                                <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="contact__link">
+                                    GitHub
+                                </a>
+                            </li>
+                            <li class="contact__item">
+                                <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" class="contact__link">
+                                    LinkedIn
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <form class="contact__form" id="contact-form" action="#" method="POST">
+                        <div class="form-group">
+                            <label for="name" class="form-label">Имя</label>
+                            <input type="text" id="name" name="name" class="form-input" required placeholder="Ваше имя">
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" name="email" class="form-input" required placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="message" class="form-label">Сообщение</label>
+                            <textarea id="message" name="message" class="form-textarea" rows="5" required placeholder="Ваше сообщение..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn--primary">Отправить</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer__container">
+            <p class="footer__copyright">
+                &copy; <span id="current-year">2024</span> Иван Иванов. Все права защищены.
+            </p>
+            <div class="footer__social">
+                <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="footer__link" aria-label="GitHub">
+                    GitHub
+                </a>
+                <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" class="footer__link" aria-label="LinkedIn">
+                    LinkedIn
+                </a>
+                <a href="mailto:ivan@example.com" class="footer__link" aria-label="Email">
+                    Email
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
 </html>

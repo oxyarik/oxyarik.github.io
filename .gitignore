@@ -1,0 +1,1 @@
+Nothing should be ignored in this case. The added and modified files are all source code and documentation files (.js, .css, .md, .html) which should be tracked in version control. There are no build artifacts, dependencies, or temporary files in the changes that would warrant adding to .gitignore.
