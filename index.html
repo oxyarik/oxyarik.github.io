@@ -512,17 +512,17 @@
             },
             {
                 name: "Модуль",
-                equation: "|x - 2| = a",
+                equation: "abs(x - 2) = a",
                 paramMin: -2,
                 paramMax: 6,
                 description: "Уравнение с модулем. Два решения при a > 0, одно при a = 0, нет решений при a < 0."
             },
             {
                 name: "Система",
-                equation: "y = x^2 + a; y = 2",
+                equation: "x^2 + a; 2",
                 paramMin: -5,
                 paramMax: 5,
-                description: "Система уравнений. Точки пересечения параболы и прямой."
+                description: "Система уравнений. Точки пересечения параболы y = x² + a и прямой y = 2."
             },
             {
                 name: "Показательное",
@@ -626,6 +626,10 @@
              * Определяет тип выражения
              */
             detectType(expression) {
+                // Сначала проверяем на систему (точка с запятой)
+                if (expression.includes(';')) {
+                    return 'system';
+                }
                 if (expression.includes('<') || expression.includes('>')) {
                     return 'inequality';
                 } else if (expression.includes('=')) {
@@ -637,8 +641,24 @@
 
             /**
              * Разделяет уравнение на левую и правую части
+             * Поддерживает системы уравнений через точку с запятой
              */
             splitEquation(expression) {
+                // Сначала проверяем на систему уравнений (точка с запятой)
+                // Формат: "f(x); g(x)" означает систему y = f(x) и y = g(x)
+                if (expression.includes(';')) {
+                    const parts = expression.split(';').map(s => s.trim());
+                    if (parts.length === 2) {
+                        return {
+                            left: parts[0],
+                            right: parts[1],
+                            operator: '=',
+                            isSystem: true
+                        };
+                    }
+                }
+                
+                // Для обычных уравнений/неравенств ищем оператор
                 const types = ['<=', '>=', '<', '>', '='];
                 for (const type of types) {
                     const index = expression.indexOf(type);
@@ -646,14 +666,18 @@
                         return {
                             left: expression.substring(0, index).trim(),
                             right: expression.substring(index + type.length).trim(),
-                            operator: type
+                            operator: type,
+                            isSystem: false
                         };
                     }
                 }
+                
+                // Если нет оператора, считаем что это функция f(x) = 0
                 return {
                     left: expression.trim(),
                     right: '0',
-                    operator: '='
+                    operator: '=',
+                    isSystem: false
                 };
             },
 
@@ -1064,7 +1088,7 @@
                 }
                 
                 // Построение графиков
-                if (type === 'function' || type === 'equation' || type === 'inequality') {
+                if (type === 'function' || type === 'equation' || type === 'inequality' || type === 'system') {
                     // Функция от x: y = f(x, a)
                     const f1 = (x) => leftFunc.evaluate(x, value);
                     const f2 = (x) => rightFunc.evaluate(x, value);
@@ -1073,12 +1097,12 @@
                     Renderer.plotFunction(f1, '#3498db', 2, 'Левая часть');
                     
                     // Рисуем правую часть (если не ноль)
-                    if (parts.right.trim() !== '0' || type === 'equation') {
+                    if (parts.right.trim() !== '0' || type === 'equation' || type === 'system') {
                         Renderer.plotFunction(f2, '#e67e22', 2, 'Правая часть');
                     }
                     
-                    // Для уравнений ищем пересечения
-                    if (type === 'equation') {
+                    // Для уравнений и систем ищем пересечения
+                    if (type === 'equation' || type === 'system') {
                         const intersections = Renderer.findIntersections(f1, f2);
                         intersections.forEach((pt, idx) => {
                             Renderer.markIntersection(pt.x, pt.y, `P${idx + 1}`);
@@ -1119,7 +1143,8 @@
                 const names = {
                     'equation': 'Уравнение',
                     'inequality': 'Неравенство',
-                    'function': 'Функция'
+                    'function': 'Функция',
+                    'system': 'Система'
                 };
                 return names[type] || 'Выражение';
             },
