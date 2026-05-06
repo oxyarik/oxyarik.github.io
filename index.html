@@ -1,279 +1,1378 @@
-<!-- index.html - Portfolio Template -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Портфолио веб-разработчика — проекты, навыки и контакты">
-    <title>Иван Иванов | Веб-разработчик</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Визуализатор задач с параметром</title>
+    
+    <!-- Подключение библиотек через CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.6.0/jsxgraphcore.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.6.0/jsxgraph.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.0/math.js"></script>
+    
+    <style>
+        /* ============================================
+           CSS STYLES - UI/UX DESIGN
+           ============================================ */
+        :root {
+            --bg-primary: #f5f7fa;
+            --bg-secondary: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --accent-blue: #3498db;
+            --accent-orange: #e67e22;
+            --accent-green: #27ae60;
+            --accent-red: #e74c3c;
+            --border-color: #bdc3c7;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --text-primary: #ecf0f1;
+            --text-secondary: #95a5a6;
+            --border-color: #34495e;
+            --shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .graph-container {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            min-height: 600px;
+        }
+
+        #jsxgraph-board {
+            width: 100%;
+            height: 600px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .controls-panel {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        input.error {
+            border-color: var(--accent-red);
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border-color);
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+        }
+
+        .param-value {
+            min-width: 60px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--accent-blue);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .btn-success {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+        }
+
+        .info-panel {
+            background: var(--bg-primary);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .info-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .analysis-text {
+            background: var(--bg-secondary);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-orange);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .error-message {
+            background: #fadbd8;
+            color: #c0392b;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .example-btn {
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .example-btn:hover {
+            border-color: var(--accent-blue);
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header" id="header">
-        <div class="container header__container">
-            <a href="#" class="header__logo" aria-label="На главную">
-                <span class="header__logo-text">Иван Иванов</span>
-            </a>
-            
-            <button class="header__toggle" id="nav-toggle" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav-menu">
-                <span class="header__toggle-bar"></span>
-                <span class="header__toggle-bar"></span>
-                <span class="header__toggle-bar"></span>
-            </button>
-            
-            <nav class="header__nav" id="nav-menu">
-                <ul class="header__nav-list">
-                    <li class="header__nav-item">
-                        <a href="#about" class="header__nav-link active">Обо мне</a>
-                    </li>
-                    <li class="header__nav-item">
-                        <a href="#projects" class="header__nav-link">Проекты</a>
-                    </li>
-                    <li class="header__nav-item">
-                        <a href="#contact" class="header__nav-link">Контакты</a>
-                    </li>
-                </ul>
-            </nav>
+    <!-- Кнопка переключения темы -->
+    <button class="btn btn-secondary theme-toggle" id="themeToggle" title="Переключить тему">
+        🌓 Тема
+    </button>
+
+    <div class="container">
+        <header>
+            <h1>📊 Визуализатор задач с параметром</h1>
+            <p class="subtitle">Интерактивный инструмент для понимания уравнений и неравенств с параметрами (9–11 класс)</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Левая панель: График -->
+            <div class="graph-container">
+                <div id="jsxgraph-board"></div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent-blue);"></div>
+                        <span>Основная функция</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent-orange);"></div>
+                        <span>Вторая функция/система</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent-green); opacity: 0.5;"></div>
+                        <span>Область решений</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent-red);"></div>
+                        <span>Критические значения</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Правая панель: Управление -->
+            <div class="controls-panel">
+                <div class="control-group">
+                    <label for="equationInput">Уравнение/неравенство:</label>
+                    <input type="text" id="equationInput" placeholder="Например: x^2 + a*x + 1 = 0" value="x^2 + a*x + 1 = 0">
+                    <div class="error-message" id="errorMessage"></div>
+                </div>
+
+                <div class="control-group">
+                    <label for="paramName">Имя параметра:</label>
+                    <input type="text" id="paramName" value="a" maxlength="3" style="width: 80px;">
+                </div>
+
+                <div class="control-group">
+                    <label>Значение параметра (<span id="paramLabel">a</span>):</label>
+                    <div class="slider-container">
+                        <input type="number" id="paramValueNum" value="0" step="0.1" min="-100" max="100" style="width: 80px;">
+                        <input type="range" id="paramSlider" min="-10" max="10" step="0.1" value="0">
+                        <span class="param-value" id="paramValueDisplay">0.0</span>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <input type="number" id="paramMin" value="-10" step="0.5" placeholder="Мин" style="flex: 1;">
+                        <input type="number" id="paramMax" value="10" step="0.5" placeholder="Макс" style="flex: 1;">
+                    </div>
+                </div>
+
+                <div class="info-panel">
+                    <div class="info-item">
+                        <div class="info-label">Тип выражения</div>
+                        <div class="info-value" id="expressionType">—</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Количество решений</div>
+                        <div class="info-value" id="solutionCount">—</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Анализ</div>
+                        <div class="analysis-text" id="analysisText">
+                            Введите уравнение или выберите пример ниже
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Примеры:</label>
+                    <div class="examples-grid" id="examplesGrid"></div>
+                </div>
+
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="updateBtn" style="flex: 1;">🔄 Обновить</button>
+                    <button class="btn btn-secondary" id="resetBtn">🔁 Сброс</button>
+                </div>
+                <button class="btn btn-success" id="screenshotBtn">📷 Сохранить скриншот</button>
+            </div>
         </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="main">
-        <!-- Hero Section -->
-        <section class="hero" id="hero">
-            <div class="container hero__container">
-                <div class="hero__content">
-                    <p class="hero__greeting">Привет, меня зовут</p>
-                    <h1 class="hero__title">Иван Иванов</h1>
-                    <p class="hero__role">Frontend-разработчик</p>
-                    <p class="hero__description">
-                        Создаю быстрые, доступные и удобные веб-интерфейсы с фокусом на пользовательский опыт и чистый код.
-                    </p>
-                    <a href="#projects" class="btn btn--primary">Смотреть проекты</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- About Section -->
-        <section class="about section" id="about">
-            <div class="container about__container">
-                <h2 class="section__title">Обо мне</h2>
-                <div class="about__content">
-                    <div class="about__photo-placeholder" aria-label="Фото профиля">
-                        <span>Фото</span>
-                    </div>
-                    <div class="about__text">
-                        <p>
-                            Я фронтенд-разработчик с более чем 5-летним опытом создания веб-приложений. 
-                            Специализируюсь на разработке производительных интерфейсов с использованием современных технологий 
-                            и лучших практик веб-доступности.
-                        </p>
-                        <p>
-                            В своей работе я придерживаюсь принципов чистого кода, модульности и переиспользуемости компонентов. 
-                            Всегда стремлюсь к тому, чтобы конечный продукт был не только функциональным, но и удобным для пользователей 
-                            с любыми возможностями.
-                        </p>
-                        <p>
-                            Когда я не пишу код, я изучаю новые технологии, участвую в опенсорс-проектах и делюсь знаниями 
-                            с сообществом разработчиков.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Projects Section -->
-        <section class="projects section" id="projects">
-            <div class="container projects__container">
-                <h2 class="section__title">Проекты</h2>
-                <div class="projects__grid">
-                    <!-- Project Card 1 -->
-                    <article class="project-card">
-                        <div class="project-card__image" aria-label="Изображение проекта"></div>
-                        <div class="project-card__content">
-                            <h3 class="project-card__title">E-commerce Платформа</h3>
-                            <p class="project-card__description">
-                                Полнофункциональный интернет-магазин с корзиной, оплатой и админ-панелью.
-                            </p>
-                            <div class="project-card__tags">
-                                <span class="tag">HTML</span>
-                                <span class="tag">CSS</span>
-                                <span class="tag">JavaScript</span>
-                            </div>
-                            <a href="#" class="project-card__link" aria-label="Перейти к проекту E-commerce">
-                                Посмотреть проект →
-                            </a>
-                        </div>
-                    </article>
-
-                    <!-- Project Card 2 -->
-                    <article class="project-card">
-                        <div class="project-card__image" aria-label="Изображение проекта"></div>
-                        <div class="project-card__content">
-                            <h3 class="project-card__title">Dashboard Аналитики</h3>
-                            <p class="project-card__description">
-                                Интерактивная панель визуализации данных с графиками и фильтрами.
-                            </p>
-                            <div class="project-card__tags">
-                                <span class="tag">SVG</span>
-                                <span class="tag">Chart API</span>
-                                <span class="tag">Flexbox</span>
-                            </div>
-                            <a href="#" class="project-card__link" aria-label="Перейти к проекту Dashboard">
-                                Посмотреть проект →
-                            </a>
-                        </div>
-                    </article>
-
-                    <!-- Project Card 3 -->
-                    <article class="project-card">
-                        <div class="project-card__image" aria-label="Изображение проекта"></div>
-                        <div class="project-card__content">
-                            <h3 class="project-card__title">Task Manager</h3>
-                            <p class="project-card__description">
-                                Приложение для управления задачами с drag-and-drop и локальным хранилищем.
-                            </p>
-                            <div class="project-card__tags">
-                                <span class="tag">LocalStorage</span>
-                                <span class="tag">Grid</span>
-                                <span class="tag">ES6+</span>
-                            </div>
-                            <a href="#" class="project-card__link" aria-label="Перейти к проекту Task Manager">
-                                Посмотреть проект →
-                            </a>
-                        </div>
-                    </article>
-
-                    <!-- Project Card 4 -->
-                    <article class="project-card">
-                        <div class="project-card__image" aria-label="Изображение проекта"></div>
-                        <div class="project-card__content">
-                            <h3 class="project-card__title">Landing Page</h3>
-                            <p class="project-card__description">
-                                Адаптивный лендинг для стартапа с анимациями и формой захвата.
-                            </p>
-                            <div class="project-card__tags">
-                                <span class="tag">CSS Animations</span>
-                                <span class="tag">Forms</span>
-                                <span class="tag">Responsive</span>
-                            </div>
-                            <a href="#" class="project-card__link" aria-label="Перейти к проекту Landing Page">
-                                Посмотреть проект →
-                            </a>
-                        </div>
-                    </article>
-
-                    <!-- Project Card 5 -->
-                    <article class="project-card">
-                        <div class="project-card__image" aria-label="Изображение проекта"></div>
-                        <div class="project-card__content">
-                            <h3 class="project-card__title">Weather App</h3>
-                            <p class="project-card__description">
-                                Приложение погоды с геолокацией и прогнозом на неделю.
-                            </p>
-                            <div class="project-card__tags">
-                                <span class="tag">Fetch API</span>
-                                <span class="tag">Geolocation</span>
-                                <span class="tag">Async/Await</span>
-                            </div>
-                            <a href="#" class="project-card__link" aria-label="Перейти к проекту Weather App">
-                                Посмотреть проект →
-                            </a>
-                        </div>
-                    </article>
-
-                    <!-- Project Card 6 -->
-                    <article class="project-card">
-                        <div class="project-card__image" aria-label="Изображение проекта"></div>
-                        <div class="project-card__content">
-                            <h3 class="project-card__title">Blog Platform</h3>
-                            <p class="project-card__description">
-                                Минималистичная платформа для ведения блога с поддержкой Markdown.
-                            </p>
-                            <div class="project-card__tags">
-                                <span class="tag">Markdown</span>
-                                <span class="tag">Typography</span>
-                                <span class="tag">SEO</span>
-                            </div>
-                            <a href="#" class="project-card__link" aria-label="Перейти к проекту Blog Platform">
-                                Посмотреть проект →
-                            </a>
-                        </div>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section class="contact section" id="contact">
-            <div class="container contact__container">
-                <h2 class="section__title">Контакты</h2>
-                <div class="contact__content">
-                    <div class="contact__info">
-                        <p class="contact__text">
-                            Открыт для новых проектов и интересных предложений. 
-                            Свяжитесь со мной любым удобным способом:
-                        </p>
-                        <ul class="contact__list">
-                            <li class="contact__item">
-                                <a href="mailto:ivan@example.com" class="contact__link">
-                                    ivan@example.com
-                                </a>
-                            </li>
-                            <li class="contact__item">
-                                <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="contact__link">
-                                    GitHub
-                                </a>
-                            </li>
-                            <li class="contact__item">
-                                <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" class="contact__link">
-                                    LinkedIn
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <form class="contact__form" id="contact-form" action="#" method="POST">
-                        <div class="form-group">
-                            <label for="name" class="form-label">Имя</label>
-                            <input type="text" id="name" name="name" class="form-input" required placeholder="Ваше имя">
-                        </div>
-                        <div class="form-group">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" id="email" name="email" class="form-input" required placeholder="your@email.com">
-                        </div>
-                        <div class="form-group">
-                            <label for="message" class="form-label">Сообщение</label>
-                            <textarea id="message" name="message" class="form-textarea" rows="5" required placeholder="Ваше сообщение..."></textarea>
-                        </div>
-                        <button type="submit" class="btn btn--primary">Отправить</button>
-                    </form>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container footer__container">
-            <p class="footer__copyright">
-                &copy; <span id="current-year">2024</span> Иван Иванов. Все права защищены.
+        <footer>
+            <p>Создано для образовательных целей | JSXGraph + Math.js | 2024</p>
+            <p style="margin-top: 5px; font-size: 0.75rem;">
+                ⚠️ Примечание: Визуализация является приближённой. Для точных аналитических решений используйте алгебраические методы.
             </p>
-            <div class="footer__social">
-                <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="footer__link" aria-label="GitHub">
-                    GitHub
-                </a>
-                <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" class="footer__link" aria-label="LinkedIn">
-                    LinkedIn
-                </a>
-                <a href="mailto:ivan@example.com" class="footer__link" aria-label="Email">
-                    Email
-                </a>
-            </div>
-        </div>
-    </footer>
+        </footer>
+    </div>
 
-    <script src="script.js"></script>
+    <script>
+        /* ============================================
+           JAVASCRIPT - MAIN APPLICATION LOGIC
+           ============================================ */
+        
+        // ==========================================
+        // БЛОК 1: КОНФИГУРАЦИЯ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+        // ==========================================
+        
+        const CONFIG = {
+            DEBOUNCE_DELAY: 50,
+            DEFAULT_PARAM_MIN: -10,
+            DEFAULT_PARAM_MAX: 10,
+            DEFAULT_PARAM_STEP: 0.1,
+            MAX_PLOT_POINTS: 500,
+            BOARD_OPTIONS: {
+                axis: true,
+                navigation: {
+                    zoomX: true,
+                    zoomY: true,
+                    pan: true
+                },
+                showCopyright: false,
+                grid: true,
+                axisHeight: 0,
+                axisTicks: true,
+                defaultAxes: {
+                    x: {
+                        ticks: {
+                            drawMajorLine: true,
+                            drawMinorLine: true,
+                            majorHeight: 10,
+                            minorHeight: 5,
+                            strokeColor: '#2c3e50',
+                            strokeWidth: 1
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            drawMajorLine: true,
+                            drawMinorLine: true,
+                            majorHeight: 10,
+                            minorHeight: 5,
+                            strokeColor: '#2c3e50',
+                            strokeWidth: 1
+                        }
+                    }
+                }
+            }
+        };
+
+        // Глобальные переменные состояния
+        let board = null;
+        let currentExpression = null;
+        let currentParamName = 'a';
+        let currentValue = 0;
+        let plotElements = [];
+        let intersectionPoints = [];
+        let debounceTimer = null;
+
+        // ==========================================
+        // БЛОК 2: ПРИМЕРЫ (PRESETS)
+        // ==========================================
+        
+        const EXAMPLES = [
+            {
+                name: "Линейное",
+                equation: "a*x + 2 = 0",
+                paramMin: -5,
+                paramMax: 5,
+                description: "Линейное уравнение с параметром. При a ≠ 0 одно решение, при a = 0 решений нет."
+            },
+            {
+                name: "Квадратное",
+                equation: "x^2 + a*x + 1 = 0",
+                paramMin: -5,
+                paramMax: 5,
+                description: "Квадратное уравнение. Дискриминант D = a² - 4. Два корня при |a| > 2, один при |a| = 2, нет корней при |a| < 2."
+            },
+            {
+                name: "Модуль",
+                equation: "|x - 2| = a",
+                paramMin: -2,
+                paramMax: 6,
+                description: "Уравнение с модулем. Два решения при a > 0, одно при a = 0, нет решений при a < 0."
+            },
+            {
+                name: "Система",
+                equation: "y = x^2 + a; y = 2",
+                paramMin: -5,
+                paramMax: 5,
+                description: "Система уравнений. Точки пересечения параболы и прямой."
+            },
+            {
+                name: "Показательное",
+                equation: "2^x = a",
+                paramMin: -1,
+                paramMax: 5,
+                description: "Показательное уравнение. Одно решение при a > 0, нет решений при a ≤ 0."
+            },
+            {
+                name: "Неравенство",
+                equation: "x^2 - a < 0",
+                paramMin: -2,
+                paramMax: 5,
+                description: "Квадратное неравенство. Решения есть только при a > 0: -√a < x < √a."
+            },
+            {
+                name: "Тригонометрия",
+                equation: "sin(x) = a",
+                paramMin: -1.5,
+                paramMax: 1.5,
+                description: "Тригонометрическое уравнение. Бесконечно много решений при |a| ≤ 1, нет решений при |a| > 1."
+            },
+            {
+                name: "Дробное",
+                equation: "1/(x - a) = 1",
+                paramMin: -5,
+                paramMax: 5,
+                description: "Дробно-рациональное уравнение. Решение x = a + 1, но x ≠ a (область определения)."
+            }
+        ];
+
+        // ==========================================
+        // БЛОК 3: DOM ЭЛЕМЕНТЫ
+        // ==========================================
+        
+        const DOM = {
+            equationInput: document.getElementById('equationInput'),
+            paramName: document.getElementById('paramName'),
+            paramSlider: document.getElementById('paramSlider'),
+            paramValueNum: document.getElementById('paramValueNum'),
+            paramValueDisplay: document.getElementById('paramValueDisplay'),
+            paramLabel: document.getElementById('paramLabel'),
+            paramMin: document.getElementById('paramMin'),
+            paramMax: document.getElementById('paramMax'),
+            errorMessage: document.getElementById('errorMessage'),
+            expressionType: document.getElementById('expressionType'),
+            solutionCount: document.getElementById('solutionCount'),
+            analysisText: document.getElementById('analysisText'),
+            examplesGrid: document.getElementById('examplesGrid'),
+            updateBtn: document.getElementById('updateBtn'),
+            resetBtn: document.getElementById('resetBtn'),
+            screenshotBtn: document.getElementById('screenshotBtn'),
+            themeToggle: document.getElementById('themeToggle')
+        };
+
+        // ==========================================
+        // БЛОК 4: ПАРСЕР МАТЕМАТИЧЕСКИХ ВЫРАЖЕНИЙ
+        // ==========================================
+        
+        /**
+         * Безопасный парсер математических выражений
+         * Использует math.js вместо eval()
+         */
+        const Parser = {
+            /**
+             * Извлекает имя параметра из выражения
+             * Игнорирует стандартные математические функции
+             */
+            extractParamName(expression, defaultParam = 'a') {
+                const knownFunctions = [
+                    'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
+                    'asin', 'acos', 'atan', 'acot', 'asec', 'acsc',
+                    'sinh', 'cosh', 'tanh', 'coth',
+                    'exp', 'log', 'log10', 'log2', 'ln',
+                    'sqrt', 'abs', 'floor', 'ceil', 'round',
+                    'sign', 'arg', 'conj', 'im', 're',
+                    'min', 'max', 'gcd', 'lcm', 'factorial'
+                ];
+
+                // Находим все одиночные буквы (потенциальные параметры)
+                const regex = /\b([a-zA-Z])\b/g;
+                const matches = [...expression.matchAll(regex)];
+                
+                for (const match of matches) {
+                    const letter = match[1];
+                    // Игнорируем 'x', 'y' (переменные), 'e', 'i' (константы)
+                    if (['x', 'y', 'e', 'i'].includes(letter.toLowerCase())) {
+                        continue;
+                    }
+                    // Игнорируем известные функции
+                    if (knownFunctions.includes(letter.toLowerCase())) {
+                        continue;
+                    }
+                    return letter;
+                }
+                
+                return defaultParam;
+            },
+
+            /**
+             * Определяет тип выражения
+             */
+            detectType(expression) {
+                if (expression.includes('<') || expression.includes('>')) {
+                    return 'inequality';
+                } else if (expression.includes('=')) {
+                    return 'equation';
+                } else {
+                    return 'function';
+                }
+            },
+
+            /**
+             * Разделяет уравнение на левую и правую части
+             */
+            splitEquation(expression) {
+                const types = ['<=', '>=', '<', '>', '='];
+                for (const type of types) {
+                    const index = expression.indexOf(type);
+                    if (index !== -1) {
+                        return {
+                            left: expression.substring(0, index).trim(),
+                            right: expression.substring(index + type.length).trim(),
+                            operator: type
+                        };
+                    }
+                }
+                return {
+                    left: expression.trim(),
+                    right: '0',
+                    operator: '='
+                };
+            },
+
+            /**
+             * Проверяет валидность выражения
+             */
+            validate(expression, paramName) {
+                try {
+                    const node = math.parse(expression);
+                    // Проверяем, что выражение содержит хотя бы одну переменную
+                    const symbols = node.filter(n => n.isSymbolNode);
+                    return { valid: true, symbols: symbols.map(s => s.name) };
+                } catch (error) {
+                    return { valid: false, error: error.message };
+                }
+            },
+
+            /**
+             * Создаёт функцию для вычисления выражения
+             */
+            compile(expression, paramName) {
+                try {
+                    const node = math.parse(expression);
+                    const code = node.compile();
+                    
+                    return {
+                        success: true,
+                        evaluate: (x, a) => {
+                            try {
+                                const scope = { x: x, [paramName]: a };
+                                return code.evaluate(scope);
+                            } catch (e) {
+                                return NaN;
+                            }
+                        }
+                    };
+                } catch (error) {
+                    return {
+                        success: false,
+                        error: error.message
+                    };
+                }
+            }
+        };
+
+        // ==========================================
+        // БЛОК 5: РЕНДЕРЕР ГРАФИКОВ (JSXGRAPH)
+        // ==========================================
+        
+        const Renderer = {
+            /**
+             * Инициализирует доску JSXGraph
+             */
+            initBoard(containerId) {
+                if (board) {
+                    board.destroy();
+                }
+                
+                board = JXG.JSXGraph.initBoard(containerId, {
+                    ...CONFIG.BOARD_OPTIONS,
+                    boundingbox: [-10, 10, 10, -10],
+                    keepAspectRatio: true
+                });
+                
+                return board;
+            },
+
+            /**
+             * Очищает все элементы с доски
+             */
+            clearBoard() {
+                if (!board) return;
+                
+                // Удаляем все сохранённые элементы
+                plotElements.forEach(el => {
+                    if (el && board.hasElement(el.id)) {
+                        board.removeObject(el);
+                    }
+                });
+                
+                intersectionPoints.forEach(el => {
+                    if (el && board.hasElement(el.id)) {
+                        board.removeObject(el);
+                    }
+                });
+                
+                plotElements = [];
+                intersectionPoints = [];
+            },
+
+            /**
+             * Строит график функции y = f(x)
+             */
+            plotFunction(func, color = '#3498db', strokeWidth = 2, label = '') {
+                if (!board) return null;
+                
+                const graph = board.create('functiongraph', [
+                    func,
+                    {
+                        strokeColor: color,
+                        strokeWidth: strokeWidth,
+                        highlightStrokeColor: color,
+                        label: {
+                            visible: !!label,
+                            text: label,
+                            position: 'top'
+                        }
+                    }
+                ], {
+                    numberOfPoints: CONFIG.MAX_PLOT_POINTS
+                });
+                
+                plotElements.push(graph);
+                return graph;
+            },
+
+            /**
+             * Строит неявное уравнение F(x,y) = 0
+             */
+            plotImplicit(func, color = '#3498db') {
+                if (!board) return null;
+                
+                try {
+                    const graph = board.create('implicitcurve', [func, -10, 10, -10, 10], {
+                        strokeColor: color,
+                        strokeWidth: 2,
+                        numberOfPoints: 200
+                    });
+                    
+                    plotElements.push(graph);
+                    return graph;
+                } catch (error) {
+                    console.warn('Implicit plot failed:', error);
+                    return null;
+                }
+            },
+
+            /**
+             * Отмечает точку пересечения
+             */
+            markIntersection(x, y, label = '') {
+                if (!board || isNaN(x) || isNaN(y)) return null;
+                
+                const point = board.create('point', [x, y], {
+                    size: 4,
+                    color: '#e74c3c',
+                    fillColor: '#e74c3c',
+                    strokeColor: '#ffffff',
+                    strokeWidth: 2,
+                    label: {
+                        visible: true,
+                        text: label || `(${x.toFixed(2)}, ${y.toFixed(2)})`,
+                        offset: [10, -10]
+                    },
+                    withLabel: true
+                });
+                
+                intersectionPoints.push(point);
+                return point;
+            },
+
+            /**
+             * Рисует вертикальную линию (критическое значение)
+             */
+            drawVerticalLine(x, color = '#e74c3c', label = '') {
+                if (!board) return null;
+                
+                const line = board.create('line', [
+                    [x, -100],
+                    [x, 100]
+                ], {
+                    strokeColor: color,
+                    strokeWidth: 2,
+                    dash: 2,
+                    label: {
+                        visible: !!label,
+                        text: label
+                    }
+                });
+                
+                plotElements.push(line);
+                return line;
+            },
+
+            /**
+             * Заштриховывает область решения неравенства
+             */
+            fillRegion(func, color = 'rgba(39, 174, 96, 0.3)') {
+                if (!board) return null;
+                
+                try {
+                    // Создаём кривую для границы области
+                    const boundary = board.create('functiongraph', [func], {
+                        strokeColor: 'transparent',
+                        fillColor: color,
+                        fillOpacity: 0.5
+                    });
+                    
+                    plotElements.push(boundary);
+                    return boundary;
+                } catch (error) {
+                    console.warn('Fill region failed:', error);
+                    return null;
+                }
+            },
+
+            /**
+             * Находит точки пересечения двух функций численно
+             */
+            findIntersections(func1, func2, range = [-10, 10], steps = 1000) {
+                const intersections = [];
+                const [min, max] = range;
+                const step = (max - min) / steps;
+                
+                let prevDiff = func1(min) - func2(min);
+                
+                for (let i = 1; i <= steps; i++) {
+                    const x = min + i * step;
+                    const currDiff = func1(x) - func2(x);
+                    
+                    // Проверяем смену знака (теорема о промежуточном значении)
+                    if (prevDiff * currDiff < 0) {
+                        // Уточняем координату методом бисекции
+                        const root = this.bisect(func1, func2, min + (i - 1) * step, x);
+                        const y = func1(root);
+                        
+                        if (Math.abs(y) < 1000 && !isNaN(y)) { // Фильтруем выбросы
+                            intersections.push({ x: root, y: y });
+                        }
+                    }
+                    
+                    prevDiff = currDiff;
+                }
+                
+                return intersections;
+            },
+
+            /**
+             * Метод бисекции для уточнения корня
+             */
+            bisect(func1, func2, a, b, tolerance = 1e-6, maxIter = 50) {
+                let left = a;
+                let right = b;
+                
+                for (let i = 0; i < maxIter; i++) {
+                    const mid = (left + right) / 2;
+                    const fMid = func1(mid) - func2(mid);
+                    
+                    if (Math.abs(fMid) < tolerance || (right - left) / 2 < tolerance) {
+                        return mid;
+                    }
+                    
+                    const fLeft = func1(left) - func2(left);
+                    if (fLeft * fMid < 0) {
+                        right = mid;
+                    } else {
+                        left = mid;
+                    }
+                }
+                
+                return (left + right) / 2;
+            }
+        };
+
+        // ==========================================
+        // БЛОК 6: АНАЛИЗАТОР РЕШЕНИЙ
+        // ==========================================
+        
+        const Analyzer = {
+            /**
+             * Анализирует уравнение и генерирует пояснение
+             */
+            analyze(expression, paramName, value) {
+                const type = Parser.detectType(expression);
+                const parts = Parser.splitEquation(expression);
+                
+                let analysis = '';
+                let solutionCount = '—';
+                
+                // Простые шаблоны для распространённых случаев
+                const lowerExpr = expression.toLowerCase().replace(/\s/g, '');
+                
+                // Квадратное уравнение: x^2 + a*x + b = 0
+                if (lowerExpr.includes('x^2') && lowerExpr.includes(paramName + '*x') && type === 'equation') {
+                    const discriminant = value * value - 4; // Для случая x^2 + a*x + 1 = 0
+                    if (discriminant > 0) {
+                        analysis = `Два различных корня. Дискриминант D = ${discriminant.toFixed(2)} > 0`;
+                        solutionCount = '2';
+                    } else if (discriminant === 0) {
+                        analysis = `Один корень (касание). Дискриминант D = 0`;
+                        solutionCount = '1';
+                    } else {
+                        analysis = `Нет действительных корней. Дискриминант D = ${discriminant.toFixed(2)} < 0`;
+                        solutionCount = '0';
+                    }
+                }
+                // Линейное уравнение: a*x + b = 0
+                else if (lowerExpr.includes(paramName + '*x') && !lowerExpr.includes('x^2') && type === 'equation') {
+                    if (Math.abs(value) < 1e-10) {
+                        analysis = `При ${paramName} = 0 уравнение вырождается. Решений нет (если свободный член ≠ 0)`;
+                        solutionCount = '0';
+                    } else {
+                        const x = -2 / value; // Для случая a*x + 2 = 0
+                        analysis = `Одно решение: x = ${x.toFixed(3)}`;
+                        solutionCount = '1';
+                    }
+                }
+                // Модуль: |x - c| = a
+                else if (lowerExpr.includes('|') && type === 'equation') {
+                    if (value > 0) {
+                        analysis = `Два решения: x₁ = c + ${value}, x₂ = c - ${value}`;
+                        solutionCount = '2';
+                    } else if (value === 0) {
+                        analysis = `Одно решение (вершина модуля)`;
+                        solutionCount = '1';
+                    } else {
+                        analysis = `Нет решений (модуль не может быть отрицательным)`;
+                        solutionCount = '0';
+                    }
+                }
+                // Показательное: a^x = b
+                else if (lowerExpr.includes('^x') || lowerExpr.includes('exp(')) {
+                    if (value > 0) {
+                        analysis = `Одно решение (показательная функция монотонна)`;
+                        solutionCount = '1';
+                    } else if (value === 0) {
+                        analysis = `Нет решений (показательная функция всегда > 0)`;
+                        solutionCount = '0';
+                    } else {
+                        analysis = `Нет решений (правая часть отрицательна)`;
+                        solutionCount = '0';
+                    }
+                }
+                // Тригонометрическое: sin(x) = a
+                else if (lowerExpr.includes('sin(') && type === 'equation') {
+                    if (Math.abs(value) < 1) {
+                        analysis = `Бесконечно много решений: x = (-1)^n·arcsin(${value}) + πn`;
+                        solutionCount = '∞';
+                    } else if (Math.abs(value) === 1) {
+                        analysis = `Бесконечно много решений: x = ±π/2 + 2πn`;
+                        solutionCount = '∞';
+                    } else {
+                        analysis = `Нет решений (|${paramName}| > 1)`;
+                        solutionCount = '0';
+                    }
+                }
+                // Неравенство
+                else if (type === 'inequality') {
+                    analysis = `Область решений показана зелёным цветом. Перемещайте ползунок для анализа.`;
+                    solutionCount = '—';
+                }
+                // Общий случай
+                else {
+                    analysis = `Перемещайте ползунок параметра ${paramName}, чтобы увидеть, как меняется график. Обратите внимание на точки пересечения.`;
+                    solutionCount = '—';
+                }
+                
+                return { analysis, solutionCount, type };
+            }
+        };
+
+        // ==========================================
+        // БЛОК 7: ОСНОВНОЙ КОНТРОЛЛЕР
+        // ==========================================
+        
+        const Controller = {
+            /**
+             * Главная функция обновления графика
+             */
+            async update() {
+                const expression = DOM.equationInput.value.trim();
+                const paramName = DOM.paramName.value.trim() || 'a';
+                const value = parseFloat(DOM.paramSlider.value);
+                
+                // Валидация
+                const validation = Parser.validate(expression, paramName);
+                if (!validation.valid) {
+                    this.showError(`Ошибка в выражении: ${validation.error}`);
+                    return;
+                }
+                
+                this.hideError();
+                
+                // Обновление состояния
+                currentExpression = expression;
+                currentParamName = paramName;
+                currentValue = value;
+                
+                // Обновление UI
+                DOM.paramLabel.textContent = paramName;
+                DOM.paramValueDisplay.textContent = value.toFixed(1);
+                DOM.paramValueNum.value = value;
+                
+                // Очистка доски
+                Renderer.clearBoard();
+                
+                // Определение типа выражения
+                const type = Parser.detectType(expression);
+                const parts = Parser.splitEquation(expression);
+                
+                // Компиляция функций
+                const leftFunc = Parser.compile(parts.left, paramName);
+                const rightFunc = Parser.compile(parts.right, paramName);
+                
+                if (!leftFunc.success || !rightFunc.success) {
+                    this.showError('Не удалось обработать выражение');
+                    return;
+                }
+                
+                // Построение графиков
+                if (type === 'function' || type === 'equation' || type === 'inequality') {
+                    // Функция от x: y = f(x, a)
+                    const f1 = (x) => leftFunc.evaluate(x, value);
+                    const f2 = (x) => rightFunc.evaluate(x, value);
+                    
+                    // Рисуем левую часть
+                    Renderer.plotFunction(f1, '#3498db', 2, 'Левая часть');
+                    
+                    // Рисуем правую часть (если не ноль)
+                    if (parts.right.trim() !== '0' || type === 'equation') {
+                        Renderer.plotFunction(f2, '#e67e22', 2, 'Правая часть');
+                    }
+                    
+                    // Для уравнений ищем пересечения
+                    if (type === 'equation') {
+                        const intersections = Renderer.findIntersections(f1, f2);
+                        intersections.forEach((pt, idx) => {
+                            Renderer.markIntersection(pt.x, pt.y, `P${idx + 1}`);
+                        });
+                    }
+                    
+                    // Для неравенств закрашиваем область
+                    if (type === 'inequality') {
+                        // Разница между левой и правой частью
+                        const diffFunc = (x) => f1(x) - f2(x);
+                        
+                        // Определяем знак неравенства
+                        if (parts.operator.includes('<')) {
+                            // Область где f1 < f2
+                            Renderer.fillRegion((x) => {
+                                return diffFunc(x) < 0 ? f1(x) : NaN;
+                            }, 'rgba(39, 174, 96, 0.3)');
+                        } else if (parts.operator.includes('>')) {
+                            // Область где f1 > f2
+                            Renderer.fillRegion((x) => {
+                                return diffFunc(x) > 0 ? f1(x) : NaN;
+                            }, 'rgba(231, 76, 60, 0.3)');
+                        }
+                    }
+                }
+                
+                // Анализ и вывод информации
+                const analysis = Analyzer.analyze(expression, paramName, value);
+                DOM.expressionType.textContent = this.getTypeName(analysis.type);
+                DOM.solutionCount.textContent = analysis.solutionCount;
+                DOM.analysisText.textContent = analysis.analysis;
+            },
+
+            /**
+             * Получает название типа выражения
+             */
+            getTypeName(type) {
+                const names = {
+                    'equation': 'Уравнение',
+                    'inequality': 'Неравенство',
+                    'function': 'Функция'
+                };
+                return names[type] || 'Выражение';
+            },
+
+            /**
+             * Показывает ошибку
+             */
+            showError(message) {
+                DOM.errorMessage.textContent = message;
+                DOM.errorMessage.classList.add('show');
+                DOM.equationInput.classList.add('error');
+            },
+
+            /**
+             * Скрывает ошибку
+             */
+            hideError() {
+                DOM.errorMessage.classList.remove('show');
+                DOM.equationInput.classList.remove('error');
+            },
+
+            /**
+             * Инициализирует примеры
+             */
+            initExamples() {
+                DOM.examplesGrid.innerHTML = '';
+                
+                EXAMPLES.forEach((example, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'example-btn';
+                    btn.textContent = example.name;
+                    btn.onclick = () => this.loadExample(index);
+                    DOM.examplesGrid.appendChild(btn);
+                });
+            },
+
+            /**
+             * Загружает пример
+             */
+            loadExample(index) {
+                const example = EXAMPLES[index];
+                
+                DOM.equationInput.value = example.equation;
+                DOM.paramMin.value = example.paramMin;
+                DOM.paramMax.value = example.paramMax;
+                
+                // Обновляем слайдер
+                DOM.paramSlider.min = example.paramMin;
+                DOM.paramSlider.max = example.paramMax;
+                DOM.paramSlider.value = (example.paramMin + example.paramMax) / 2;
+                
+                // Автоматически определяем параметр
+                const detectedParam = Parser.extractParamName(example.equation);
+                DOM.paramName.value = detectedParam;
+                
+                // Обновляем график
+                this.update();
+                
+                // Показываем описание в анализе
+                DOM.analysisText.textContent = example.description;
+            },
+
+            /**
+             * Сбрасывает настройки
+             */
+            reset() {
+                DOM.equationInput.value = 'x^2 + a*x + 1 = 0';
+                DOM.paramName.value = 'a';
+                DOM.paramMin.value = -10;
+                DOM.paramMax.value = 10;
+                DOM.paramSlider.min = -10;
+                DOM.paramSlider.max = 10;
+                DOM.paramSlider.value = 0;
+                
+                this.update();
+            },
+
+            /**
+             * Сохраняет скриншот
+             */
+            saveScreenshot() {
+                const boardContainer = document.getElementById('jsxgraph-board');
+                const svg = boardContainer.querySelector('svg');
+                
+                if (!svg) {
+                    alert('Не удалось создать скриншот');
+                    return;
+                }
+                
+                // Создаём canvas для рендера
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const rect = svg.getBoundingClientRect();
+                
+                canvas.width = rect.width * 2;
+                canvas.height = rect.height * 2;
+                ctx.scale(2, 2);
+                
+                // Рисуем белый фон
+                ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--bg-secondary');
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Конвертируем SVG в изображение
+                const svgData = new XMLSerializer().serializeToString(svg);
+                const img = new Image();
+                const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(svgBlob);
+                
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0);
+                    URL.revokeObjectURL(url);
+                    
+                    // Скачиваем файл
+                    const link = document.createElement('a');
+                    link.download = `graph_${Date.now()}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                };
+                
+                img.src = url;
+            },
+
+            /**
+             * Переключает тему
+             */
+            toggleTheme() {
+                const isDark = document.body.getAttribute('data-theme') === 'dark';
+                document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+                
+                // Перерисовываем график с новыми цветами
+                if (board) {
+                    board.renderer.container.style.background = getComputedStyle(document.body).getPropertyValue('--bg-secondary');
+                }
+            }
+        };
+
+        // ==========================================
+        // БЛОК 8: ОБРАБОТЧИКИ СОБЫТИЙ
+        // ==========================================
+        
+        function setupEventListeners() {
+            // Обновление по кнопке
+            DOM.updateBtn.addEventListener('click', () => Controller.update());
+            
+            // Сброс
+            DOM.resetBtn.addEventListener('click', () => Controller.reset());
+            
+            // Скриншот
+            DOM.screenshotBtn.addEventListener('click', () => Controller.saveScreenshot());
+            
+            // Тема
+            DOM.themeToggle.addEventListener('click', () => Controller.toggleTheme());
+            
+            // Слайдер параметра (с debounce)
+            DOM.paramSlider.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => Controller.update(), CONFIG.DEBOUNCE_DELAY);
+            });
+            
+            // Числовое поле параметра
+            DOM.paramValueNum.addEventListener('change', () => {
+                const value = parseFloat(DOM.paramValueNum.value);
+                const min = parseFloat(DOM.paramSlider.min);
+                const max = parseFloat(DOM.paramSlider.max);
+                
+                if (value >= min && value <= max) {
+                    DOM.paramSlider.value = value;
+                    Controller.update();
+                }
+            });
+            
+            // Изменение диапазона параметра
+            DOM.paramMin.addEventListener('change', () => {
+                const min = parseFloat(DOM.paramMin.value);
+                const max = parseFloat(DOM.paramMax.value);
+                
+                if (min < max) {
+                    DOM.paramSlider.min = min;
+                    const currentValue = parseFloat(DOM.paramSlider.value);
+                    if (currentValue < min) {
+                        DOM.paramSlider.value = min;
+                    }
+                    Controller.update();
+                }
+            });
+            
+            DOM.paramMax.addEventListener('change', () => {
+                const min = parseFloat(DOM.paramMin.value);
+                const max = parseFloat(DOM.paramMax.value);
+                
+                if (max > min) {
+                    DOM.paramSlider.max = max;
+                    const currentValue = parseFloat(DOM.paramSlider.value);
+                    if (currentValue > max) {
+                        DOM.paramSlider.value = max;
+                    }
+                    Controller.update();
+                }
+            });
+            
+            // Ввод уравнения (с debounce)
+            DOM.equationInput.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    // Автоматически определяем параметр при изменении уравнения
+                    const expression = DOM.equationInput.value.trim();
+                    const detectedParam = Parser.extractParamName(expression);
+                    if (detectedParam !== currentParamName) {
+                        DOM.paramName.value = detectedParam;
+                    }
+                    Controller.update();
+                }, CONFIG.DEBOUNCE_DELAY * 2);
+            });
+            
+            // Изменение имени параметра
+            DOM.paramName.addEventListener('change', () => {
+                Controller.update();
+            });
+            
+            // Enter в поле уравнения
+            DOM.equationInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    Controller.update();
+                }
+            });
+        }
+
+        // ==========================================
+        // БЛОК 9: ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
+        // ==========================================
+        
+        function init() {
+            // Инициализация доски
+            board = Renderer.initBoard('jsxgraph-board');
+            
+            // Инициализация примеров
+            Controller.initExamples();
+            
+            // Настройка обработчиков событий
+            setupEventListeners();
+            
+            // Первая отрисовка
+            Controller.update();
+            
+            console.log('✅ Визуализатор успешно инициализирован');
+        }
+
+        // Запуск после загрузки DOM
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
 </body>
 </html>
